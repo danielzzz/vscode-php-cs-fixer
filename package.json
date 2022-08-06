@@ -2,7 +2,7 @@
 	"name": "vscode-php-cs-fixer",
 	"displayName": "vscode-php-cs-fixer",
 	"description": "Support for php-cs-fixer in Visual Studio Code",
-	"version": "0.5.0",
+	"version": "0.4.0",
 	"publisher": "fterrag",
 	"engines": {
 		"vscode": "^1.18.0"
@@ -65,6 +65,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Runs fix command on save"
+				},
+				"vscode-php-cs-fixer.intersection": {
+					"type": "boolean",
+					"default": false,
+					"description": "Set path mode to intersection (--pathmode=intersection)"
 				}
 			}
 		}
@@ -82,11 +87,5 @@
 	},
 	"dependencies": {
 		"tmp": "^0.1.0"
-	},
-	"__metadata": {
-		"id": "ddca2c14-67cb-488e-8046-dc12bd814f95",
-		"publisherDisplayName": "Frank Terragna",
-		"publisherId": "2e2f1ee0-aa9b-4acd-8f7a-faffbc4676b6",
-		"isPreReleaseVersion": false
 	}
 }
