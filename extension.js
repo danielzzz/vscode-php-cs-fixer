@@ -3,20 +3,71 @@ const path = require('path');
 const fs = require('fs');
 const tmp = require('tmp');
 const cp = require('child_process');
+const { config } = require('process');
+let logMessages = [];
+log('PhpCsFixer extension started');
+
+function log(msg) {
+    logMessages.push(msg);
+}
+
+function dumpLog() {
+    const output = vscode.window.createOutputChannel('Tasks');
+    output.show();
+    logMessages.forEach(msg => output.appendLine(msg));
+    logMessages = [];
+}
+
 
 function formatDocument(document) {
     if (document.languageId !== 'php') {
         return;
     }
 
-    let toolPath = getConfig('toolPath');
-    let filename = document.fileName;
-    let args = [];
-    let opts = { cwd: path.dirname(filename) };
+    const filename = document.fileName;
+    const opts = { cwd: path.dirname(filename) };
 
-    if (!toolPath) {
-        toolPath = vscode.extensions.getExtension('fterrag.vscode-php-cs-fixer').extensionPath + '/php-cs-fixer';
-    }
+    const toolPath = getToolPath(opts.cwd);
+    log('php-cs-fixer: ' + toolPath);
+
+    // allow to have multiple config files separated by comma:
+    // php-cs-fixer.php,php_cs.dist 
+    // which allows to use different file names per project (legacy dependency)
+    const configFile = getConfigFile(opts.cwd);
+    log('config: ' + configFile);
+
+    // create a temp file
+    const tmpFile = tmp.fileSync();
+    const originalText = document.getText(null);
+    fs.writeFileSync(tmpFile.name, originalText);
+
+    const args = makeArgs(toolPath, configFile, tmpFile.name)
+
+    return new Promise(function (resolve) {
+        log('execute: php ' + args.join(' '));
+        cp.execFile('php', args, opts, function (err, stdout, stderr) {
+            log("\nPHPCsFixer error");
+            log(err.cmd);
+            log(stderr);
+            if (err) {
+                tmpFile.removeCallback();
+                vscode.window.showErrorMessage('There was an error while running php-cs-fixer. Please check the console output for more info');
+                dumpLog();
+                resolve(originalText);
+
+                return;
+            }
+
+            const text = fs.readFileSync(tmpFile.name, 'utf-8');
+            tmpFile.removeCallback();
+            log("done");
+            resolve(text);
+        });
+    });
+}
+
+function makeArgs(toolPath, configPath, filePath) {
+    let args = [];
 
     args.push(toolPath);
     args.push('fix');
@@ -29,66 +80,115 @@ function formatDocument(document) {
         args.push('--allow-risky=yes');
     }
 
-    let config = getConfig('config');
-    if (config) {
-        // Support config file with relative path
-        if (!path.isAbsolute(config)) {
-            let currentPath = opts.cwd;
-            let triedPaths = [currentPath];
-            while (!fs.existsSync(currentPath + path.sep + config)) {
-                let lastPath = currentPath;
-                currentPath = path.dirname(currentPath);
-                if (lastPath == currentPath) {
-                    vscode.window.showErrorMessage(`Unable to find ${config} file in ${triedPaths.join(", ")}`);
-                    return;
-                } else {
-                    triedPaths.push(currentPath);
-                }
-            }
-            config = currentPath + path.sep + config;
-        }
+    if (configPath) {
+        args.push('--config=' + configPath);
+    }
 
-        args.push('--config=' + config);
-    } else {
+    if (!configPath) {
+        // log("config file not found. adding rules")
         let rules = getConfig('rules');
         if (rules) {
             args.push('--rules=' + rules);
         }
     }
 
-    const tmpFile = tmp.fileSync();
-    fs.writeFileSync(tmpFile.name, document.getText(null));
+    args.push(filePath);
 
-    // console.log('php-cs-fixer temporary file: ' + tmpFile.name);
+    return args;
+}
 
-    return new Promise(function(resolve) {
-        cp.execFile('php', [...args, tmpFile.name], opts, function (err) {
-            if (err) {
-                tmpFile.removeCallback();
+function getConfigFile(basePath) {
+    let fileNames = getConfig('config').split(',');
+    let configFile;
+    try {
+        configFile = getFilePath(fileNames, basePath);
+    } catch (e) {
+        vscode.window.showErrorMessage(e);
+    }
+    return configFile;
+}
 
-                if (err.code === 'ENOENT') {
-                    vscode.window.showErrorMessage('Unable to find the php-cs-fixer tool.');
-                    throw err;
-                }
+function getToolPath(basePath) {
+    const defaultPath = vscode.extensions.getExtension('fterrag.vscode-php-cs-fixer').extensionPath + '/php-cs-fixer';
+    let pathConfig = getConfig('toolPath');
 
-                vscode.window.showErrorMessage('There was an error while running php-cs-fixer. Check the Developer Tools console for more information.');
-                throw err;
+    if (!pathConfig) {
+        return defaultPath;
+    }
+
+    let toolPaths = pathConfig.split(',');
+    let toolPath = getFilePath(toolPaths, basePath);
+
+    if (!toolPath) {
+        return defaultPath;
+    }
+
+    return toolPath;
+}
+
+
+function absoluteExists(filePath) {
+    return path.isAbsolute(filePath) && fs.existsSync(filePath);
+}
+
+/**
+ * finds if any of filenames exists in basePath and parent directories
+ * and returns the path
+ * @param {array} fileNames 
+ * @param {string} basePath 
+ * @returns string | undefined
+ */
+function getFilePath(fileNames, basePath) {
+    if (fileNames.length === 0) {
+        return undefined;
+    }
+
+    let currentPath;
+    let currentFile;
+    let triedPaths;
+    let foundPath;
+
+    for (let i = 0; i < fileNames.length; i++) {
+        currentFile = fileNames[i];
+
+        // log(currentFile);
+        if (absoluteExists(currentFile)) {
+            // log('found absolute');
+            return currentFile;
+        }
+
+        currentPath = basePath;
+        triedPaths = [currentPath];
+        while (!fs.existsSync(currentPath + path.sep + currentFile)) {
+            let lastPath = currentPath;
+            currentPath = path.resolve(currentPath, '..');
+            // log(currentPath);
+            // log(lastPath + ":" + currentPath);
+            if (lastPath === currentPath) {
+                // log('not found');
+                break;
+            } else {
+                triedPaths.push(currentPath);
             }
+        }
 
-            const text = fs.readFileSync(tmpFile.name, 'utf-8');
-            tmpFile.removeCallback();
+        foundPath = currentPath + path.sep + currentFile;
+        // log(foundPath);
+        if (fs.existsSync(foundPath)) {
+            // log('really found ' + foundPath);
+            return foundPath;
+        }
+    };
 
-            resolve(text);
-        });
-    });
+    return undefined;
 }
 
 function registerDocumentProvider(document, options) {
-    return new Promise(function(resolve, reject) {
-        formatDocument(document).then(function(text) {
+    return new Promise(function (resolve, reject) {
+        formatDocument(document).then(function (text) {
             const range = new vscode.Range(new vscode.Position(0, 0), document.lineAt(document.lineCount - 1).range.end);
             resolve([new vscode.TextEdit(range, text)]);
-        }).catch(function(err) {
+        }).catch(function (err) {
             reject();
         });
     });
@@ -103,14 +203,14 @@ function activate(context) {
         vscode.commands.executeCommand('editor.action.formatDocument');
     }));
 
-    context.subscriptions.push(vscode.workspace.onWillSaveTextDocument(function(event) {
+    context.subscriptions.push(vscode.workspace.onWillSaveTextDocument(function (event) {
         if (event.document.languageId === 'php' && getConfig('fixOnSave') && vscode.workspace.getConfiguration('editor', null).get('formatOnSave') == false) {
             event.waitUntil(vscode.commands.executeCommand('editor.action.formatDocument'));
         }
     }));
 
     context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider('php', {
-        provideDocumentFormattingEdits: function(document, options) {
+        provideDocumentFormattingEdits: function (document, options) {
             return registerDocumentProvider(document, options);
         }
     }));
