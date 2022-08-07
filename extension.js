@@ -27,6 +27,9 @@ function formatDocument(document) {
     const filename = document.fileName;
     const opts = { cwd: path.dirname(filename) };
 
+    // find a php-cs-fixer binary closest to the processed file
+    // and falback to the one provided with the extension
+    // if not found any
     const toolPath = getToolPath(opts.cwd);
     log('php-cs-fixer: ' + toolPath);
 
