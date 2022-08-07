@@ -41,26 +41,33 @@ function formatDocument(document) {
     const originalText = document.getText(null);
     fs.writeFileSync(tmpFile.name, originalText);
 
-    const args = makeArgs(toolPath, configFile, tmpFile.name)
+    const args = makeArgs(toolPath, configFile, tmpFile.name);
 
     return new Promise(function (resolve) {
         log('execute: php ' + args.join(' '));
+
         cp.execFile('php', args, opts, function (err, stdout, stderr) {
-            log("\nPHPCsFixer error");
-            log(err.cmd);
-            log(stderr);
-            if (err) {
+
+
+
+            if (null !== err) {
+                log("\nPHPCsFixer error");
+                log(JSON.stringify(err));
+                log(stdout);
+                log(stderr);
+                dumpLog();
                 tmpFile.removeCallback();
                 vscode.window.showErrorMessage('There was an error while running php-cs-fixer. Please check the console output for more info');
-                dumpLog();
+
                 resolve(originalText);
 
                 return;
             }
-
+            log(stdout);
+            log("php-cs-fixer done");
+            dumpLog();
             const text = fs.readFileSync(tmpFile.name, 'utf-8');
             tmpFile.removeCallback();
-            log("done");
             resolve(text);
         });
     });
@@ -76,10 +83,10 @@ function makeArgs(toolPath, configPath, filePath) {
         args.push('--using-cache=no');
     }
 
+
     if (getConfig('allowRisky')) {
         args.push('--allow-risky=yes');
     }
-
     if (getConfig('intersection')) {
         args.push('--path-mode=intersection');
     }
@@ -200,7 +207,12 @@ function registerDocumentProvider(document, options) {
 }
 
 function getConfig(key) {
-    return vscode.workspace.getConfiguration('vscode-php-cs-fixer').get(key);
+    try {
+        return vscode.workspace.getConfiguration('vscode-php-cs-fixer').get(key);
+    } catch (e) {
+        return undefined;
+    }
+
 }
 
 function activate(context) {
