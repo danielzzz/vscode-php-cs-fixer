@@ -1,8 +1,9 @@
 # vscode-php-cs-fixer
 
 This extension adds support for running `php-cs-fixer fix` on PHP files in Visual Studio Code.
+It's a fork (and a further development) of https://github.com/fterrag/vscode-php-cs-fixer which has been discontinued. 
 
-![demo](https://github.com/fterrag/vscode-php-cs-fixer/raw/master/demo.gif)
+![demo](https://github.com/danielzzz/vscode-php-cs-fixer/raw/master/demo.gif)
 
 ## Getting Started
 

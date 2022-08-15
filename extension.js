@@ -124,7 +124,7 @@ function getConfigFile(basePath) {
 }
 
 function getToolPath(basePath) {
-    const defaultPath = vscode.extensions.getExtension('fterrag.vscode-php-cs-fixer').extensionPath + '/php-cs-fixer';
+    const defaultPath = vscode.extensions.getExtension('danielzzz.vscode-php-cs-fixer-reloaded').extensionPath + '/php-cs-fixer';
     let pathConfig = getConfig('toolPath');
 
     if (!pathConfig) {
@@ -211,7 +211,7 @@ function registerDocumentProvider(document, options) {
 
 function getConfig(key) {
     try {
-        return vscode.workspace.getConfiguration('vscode-php-cs-fixer').get(key);
+        return vscode.workspace.getConfiguration('vscode-php-cs-fixer-reloaded').get(key);
     } catch (e) {
         return undefined;
     }
@@ -219,7 +219,7 @@ function getConfig(key) {
 }
 
 function activate(context) {
-    context.subscriptions.push(vscode.commands.registerTextEditorCommand('vscode-php-cs-fixer.fix', function (textEditor) {
+    context.subscriptions.push(vscode.commands.registerTextEditorCommand('vscode-php-cs-fixer-reloaded.fix', function (textEditor) {
         vscode.commands.executeCommand('editor.action.formatDocument');
     }));
 
