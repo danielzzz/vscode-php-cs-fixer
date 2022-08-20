@@ -1,91 +1,97 @@
 {
-    "name": "vscode-php-cs-fixer-reloaded",
-    "displayName": "vscode-php-cs-fixer reloaded",
-    "description": "Support for php-cs-fixer in Visual Studio Code. A fork of a discontinued fterrag's extension",
-    "version": "0.5.1",
-    "publisher": "danielzzz",
-    "engines": {
-        "vscode": "^1.18.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/danielzzz/vscode-php-cs-fixer"
-    },
-    "categories": [
-        "Formatters"
-    ],
-    "keywords": [
-        "PHP",
-        "PHP formatter",
-        "PHP format",
-        "phpfmt",
-        "php-cs-fixer"
-    ],
-    "activationEvents": [
-        "onLanguage:php"
-    ],
-    "main": "./extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "vscode-php-cs-fixer-reloaded.fix",
-                "title": "php-cs-fixer: fix"
-            }
-        ],
-        "configuration": {
-            "title": "php-cs-fixer reloaded",
-            "type": "object",
-            "properties": {
-                "vscode-php-cs-fixer-reloaded.toolPath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "The path to the php-cs-fixer tool"
-                },
-                "vscode-php-cs-fixer-reloaded.useCache": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Use a cache file when fixing files (--using-cache)"
-                },
-                "vscode-php-cs-fixer-reloaded.allowRisky": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Are risky fixers allowed (--allow-risky)"
-                },
-                "vscode-php-cs-fixer-reloaded.config": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Path to a .php_cs file (--config)"
-                },
-                "vscode-php-cs-fixer-reloaded.rules": {
-                    "type": "string",
-                    "default": "@PSR1,@PSR2,@Symfony,-yoda_style",
-                    "description": "Rules to use when fixing files (--rules)"
-                },
-                "vscode-php-cs-fixer-reloaded.fixOnSave": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Runs fix command on save"
-                },
-                "vscode-php-cs-fixer-reloaded.intersection": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Set path mode to intersection (--pathmode=intersection)"
-                }
-            }
-        }
-    },
-    "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "eslint": "^4.6.1",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
-    },
-    "dependencies": {
-        "tmp": "^0.1.0"
-    }
+	"name": "vscode-php-cs-fixer-reloaded",
+	"displayName": "vscode-php-cs-fixer reloaded",
+	"description": "Support for php-cs-fixer in Visual Studio Code. A fork of a discontinued fterrag's extension",
+	"version": "0.5.2",
+	"publisher": "danielzzz",
+	"engines": {
+		"vscode": "^1.18.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/danielzzz/vscode-php-cs-fixer"
+	},
+	"categories": [
+		"Formatters"
+	],
+	"keywords": [
+		"PHP",
+		"PHP formatter",
+		"PHP format",
+		"phpfmt",
+		"php-cs-fixer"
+	],
+	"activationEvents": [
+		"onLanguage:php"
+	],
+	"main": "./extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "vscode-php-cs-fixer-reloaded.fix",
+				"title": "php-cs-fixer: fix"
+			}
+		],
+		"configuration": {
+			"title": "php-cs-fixer reloaded",
+			"type": "object",
+			"properties": {
+				"vscode-php-cs-fixer-reloaded.toolPath": {
+					"type": "string",
+					"default": "",
+					"description": "The path to the php-cs-fixer tool"
+				},
+				"vscode-php-cs-fixer-reloaded.useCache": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use a cache file when fixing files (--using-cache)"
+				},
+				"vscode-php-cs-fixer-reloaded.allowRisky": {
+					"type": "boolean",
+					"default": false,
+					"description": "Are risky fixers allowed (--allow-risky)"
+				},
+				"vscode-php-cs-fixer-reloaded.config": {
+					"type": "string",
+					"default": "",
+					"description": "Path to a .php_cs file (--config)"
+				},
+				"vscode-php-cs-fixer-reloaded.rules": {
+					"type": "string",
+					"default": "@PSR1,@PSR2,@Symfony,-yoda_style",
+					"description": "Rules to use when fixing files (--rules)"
+				},
+				"vscode-php-cs-fixer-reloaded.fixOnSave": {
+					"type": "boolean",
+					"default": true,
+					"description": "Runs fix command on save"
+				},
+				"vscode-php-cs-fixer-reloaded.intersection": {
+					"type": "boolean",
+					"default": false,
+					"description": "Set path mode to intersection (--pathmode=intersection)"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^2.6.1",
+		"vscode": "^1.1.6",
+		"eslint": "^4.6.1",
+		"@types/node": "^7.0.43",
+		"@types/mocha": "^2.2.42"
+	},
+	"dependencies": {
+		"tmp": "^0.1.0"
+	},
+	"__metadata": {
+		"id": "5a71ed5a-4a24-4a61-bb1f-7e9a1752ab45",
+		"publisherDisplayName": "dan zelisko",
+		"publisherId": "feb8d9b9-0915-429a-ae15-66574972675f",
+		"isPreReleaseVersion": false
+	}
 }

@@ -13,7 +13,7 @@ function log(msg) {
 
 function dumpLog() {
     const output = vscode.window.createOutputChannel('Tasks');
-    output.show();
+    // output.show();
     logMessages.forEach(msg => output.appendLine(msg));
     logMessages = [];
 }
@@ -59,6 +59,7 @@ function formatDocument(document) {
                 log(stdout);
                 log(stderr);
                 dumpLog();
+
                 tmpFile.removeCallback();
                 vscode.window.showErrorMessage('There was an error while running php-cs-fixer. Please check the console output for more info');
 
@@ -69,6 +70,7 @@ function formatDocument(document) {
             log(stdout);
             log("php-cs-fixer done");
             dumpLog();
+            vscode.window.showTextDocument(vscode.window.activeTextEditor.document)
             const text = fs.readFileSync(tmpFile.name, 'utf-8');
             tmpFile.removeCallback();
             resolve(text);
