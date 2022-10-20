@@ -5,6 +5,7 @@ const tmp = require('tmp');
 const cp = require('child_process');
 const { config } = require('process');
 let logMessages = [];
+const output = vscode.window.createOutputChannel('PHP-CS-Fixer-Reloaded');
 log('PhpCsFixer extension started');
 
 function log(msg) {
@@ -12,7 +13,7 @@ function log(msg) {
 }
 
 function dumpLog() {
-    const output = vscode.window.createOutputChannel('Tasks');
+    
     // output.show();
     logMessages.forEach(msg => output.appendLine(msg));
     logMessages = [];
