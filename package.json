@@ -2,7 +2,7 @@
 	"name": "vscode-php-cs-fixer-reloaded",
 	"displayName": "vscode-php-cs-fixer reloaded",
 	"description": "Support for php-cs-fixer in Visual Studio Code. A fork of a discontinued fterrag's extension",
-	"version": "0.5.4",
+	"version": "0.5.6",
 	"publisher": "danielzzz",
 	"engines": {
 		"vscode": "^1.18.0"
