@@ -77,7 +77,7 @@
 	"scripts": {
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"test": "node ./node_modules/vscode/bin/test",
-		"publish-vsce": ". .env"
+		"publish-vsce": ". ./.env && vsce publish"
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.42",
